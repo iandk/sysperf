@@ -28,45 +28,39 @@ next() {
     printf "%-70s\n" "-" | sed 's/\s/-/g'
 }
 
-speed_test_v4() {
-    local output=$(LANG=C wget -4O /dev/null -T300 $1 2>&1)
-    local speedtest=$(printf '%s' "$output" | awk '/\/dev\/null/ {speed=$3 $4} END {gsub(/\(|\)/,"",speed); print speed}')
-    local ipaddress=$(printf '%s' "$output" | awk -F'|' '/Connecting to .*\|([^\|]+)\|/ {print $2}')
+speed_test() {
+    local output4=$(LANG=C wget -4O /dev/null -T300 $1 2>&1)
+    local speedtest4=$(printf '%s' "$output4" | awk '/\/dev\/null/ {speed=$3 $4} END {gsub(/\(|\)/,"",speed); print speed}')
     local nodeName=$2
-    printf "${YELLOW}%-32s${GREEN}%-24s${RED}%-14s${PLAIN}\n" "${nodeName}" "${speedtest}"
+    if [[ "$ipv6" != "" ]]; then
+      local output6=$(LANG=C wget -6O /dev/null -T300 $1 2>&1)
+      local speedtest6=$(printf '%s' "$output6" | awk '/\/dev\/null/ {speed=$3 $4} END {gsub(/\(|\)/,"",speed); print speed}')
+      printf "${YELLOW}%-32s${GREEN}%-24s${RED}%-14s${PLAIN}\n" "${nodeName}" "${speedtest4}" "${speedtest6}"
+    else
+      printf "${YELLOW}%-32s${GREEN}%-24s${RED}%-14s${PLAIN}\n" "${nodeName}" "${speedtest4}"
+    fi
 }
 
-speed_test_v6() {
-    local output=$(LANG=C wget -6O /dev/null -T300 $1 2>&1)
-    local speedtest=$(printf '%s' "$output" | awk '/\/dev\/null/ {speed=$3 $4} END {gsub(/\(|\)/,"",speed); print speed}')
-    local ipaddress=$(printf '%s' "$output" | awk -F'|' '/Connecting to .*\|([^\|]+)\|/ {print $2}')
-    local nodeName=$2
-    printf "${YELLOW}%-32s${GREEN}%-24s${RED}%-14s${PLAIN}\n" "${nodeName}" "${speedtest}"
-}
-
-speed_v4() {
-    speed_test_v4 'http://speedtest.frankfurt.linode.com/100MB-frankfurt.bin' 'Linode, Frankfurt'
-    speed_test_v4 'http://speedtest-fra1.digitalocean.com/100mb.test' 'Digitalocean, Frankfurt'
-    speed_test_v4 'http://speedtest.meerfarbig.net/testfiles/100M' 'Meerfarbig, Frankfurt'
-    speed_test_v4 'http://speedtest.london.linode.com/100MB-london.bin' 'Linode, Londonn'
-    speed_test_v4 'http://speedtest-lon1.digitalocean.com/100mb.test' 'Digitalocean, London'
-    speed_test_v4 'http://speedtest-ams2.digitalocean.com/100mb.test' 'Digitalocean, Amsterdam'
-}
-
-speed_v6() {
-    speed_test_v6 'http://speedtest.frankfurt.linode.com/100MB-frankfurt.bin' 'Linode, Frankfurt'
-    speed_test_v6 'http://speedtest-fra1.digitalocean.com/100mb.test' 'Digitalocean, Frankfurt'
-    speed_test_v6 'http://speedtest.meerfarbig.net/testfiles/100M' 'Meerfarbig, Frankfurt'
-    speed_test_v6 'http://speedtest.london.linode.com/100MB-london.bin' 'Linode, London'
-    speed_test_v6 'http://speedtest-lon1.digitalocean.com/100mb.test' 'Digitalocean, London'
-    speed_test_v6 'http://speedtest-ams2.digitalocean.com/100mb.test' 'Digitalocean, Amsterdam'
+speed_result() {
+    speed_test 'http://speedtest.frankfurt.linode.com/100MB-frankfurt.bin' 'Linode, Frankfurt'
+    speed_test 'http://speedtest-fra1.digitalocean.com/100mb.test' 'Digitalocean, Frankfurt'
+    speed_test 'http://speedtest.meerfarbig.net/testfiles/100M' 'Meerfarbig, Frankfurt'
+    speed_test 'http://speedtest.london.linode.com/100MB-london.bin' 'Linode, London'
+    speed_test 'http://speedtest-lon1.digitalocean.com/100mb.test' 'Digitalocean, London'
+    speed_test 'http://speedtest-ams2.digitalocean.com/100mb.test' 'Digitalocean, Amsterdam'
 }
 
 ping_test() {
   local nodename=$2
-  local output=$(ping -c 2 -w 2 $1 | grep rtt | cut -d'/' -f4 | awk '{ print $3 }')
-  local output="$output ms"
-  printf "${YELLOW}%-32s${RED}%-24s${RED}%-14s${PLAIN}\n" "${nodename}" "${output}"
+  local output4=$(ping -4 -w 2 $1 | grep rtt | cut -d'/' -f4 | awk '{ print $3 }')
+  local output4="$output4 ms"
+  local output6=$(ping -6 -w 2 $1 | grep rtt | cut -d'/' -f4 | awk '{ print $3 }')
+  local output6="$output6 ms"
+  if [[ "$ipv6" != "" ]]; then
+    printf "${YELLOW}%-32s${GREEN}%-24s${RED}%-14s${PLAIN}\n" "${nodename}" "${output4}" "${output6}"
+  else
+    printf "${YELLOW}%-32s${GREEN}%-24s${RED}%-14s${PLAIN}\n" "${nodename}" "${output4}"
+  fi
 }
 
 ping_result() {
@@ -152,14 +146,14 @@ ioall=$( awk 'BEGIN{print '$ioraw1' + '$ioraw2' + '$ioraw3'}' )
 ioavg=$( awk 'BEGIN{printf "%.1f", '$ioall' / 3}' )
 echo -e "Average I/O speed    : ${YELLOW}$ioavg MB/s${PLAIN}"
 next
-printf "%-32s%-24s%-14s\n" "Location" "Latency"
+if [[ "$ipv6" != "" ]]; then
+  printf "%-32s%-24s%-14s\n" "Location" "IPv4 Latency" "IPv6 Latency"
+else
+  printf "%-32s%-24s%-14s\n" "Location" "IPv4 Latency"
+fi
 ping_result
 next
-printf "%-32s%-24s%-14s\n" "Location" "IPv4 Download Speed"
-speed_v4 && next
-if [[ "$ipv6" != "" ]]; then
-    printf "%-32s%-24s%-14s\n" "Location" "IPv6 Download Speed"
-    speed_v6 && next
-fi
-    cpu_bench
+printf "%-32s%-24s%-14s\n" "Location" "IPv4 Speed" "IPv6 Speed"
+speed_result && next
+cpu_bench
 echo -e "Total CPU bench time : ${BLUE}$cpu_time${PLAIN}"&& next

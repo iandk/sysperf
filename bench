@@ -153,7 +153,12 @@ else
 fi
 ping_result
 next
-printf "%-32s%-24s%-14s\n" "Location" "IPv4 Speed" "IPv6 Speed"
+if [[ "$ipv6" != "" ]]; then
+    printf "%-32s%-24s%-14s\n" "Location" "IPv4 Speed" "IPv6 Speed"
+else
+  printf "%-32s%-24s%-14s\n" "Location" "IPv4 Speed"
+fi
+    
 speed_result && next
 cpu_bench
 echo -e "Total CPU bench time : ${BLUE}$cpu_time${PLAIN}"&& next

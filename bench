@@ -54,9 +54,9 @@ ping_test() {
   local nodename=$2
   local output4=$(ping -w 2 $1 | grep rtt | cut -d'/' -f4 | awk '{ print $3 }')
   local output4="$output4 ms"
-  local output6=$(ping6 -w 2 $1 | grep rtt | cut -d'/' -f4 | awk '{ print $3 }')
-  local output6="$output6 ms"
   if [[ "$ipv6" != "" ]]; then
+    local output6=$(ping6 -w 2 $1 | grep rtt | cut -d'/' -f4 | awk '{ print $3 }')
+    local output6="$output6 ms"
     printf "${YELLOW}%-32s${GREEN}%-24s${RED}%-14s${PLAIN}\n" "${nodename}" "${output4}" "${output6}"
   else
     printf "${YELLOW}%-32s${GREEN}%-24s${RED}%-14s${PLAIN}\n" "${nodename}" "${output4}"

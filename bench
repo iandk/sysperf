@@ -52,7 +52,7 @@ speed_result() {
 
 ping_test() {
   local nodename=$2
-  local output4=$(ping4 -w 2 $1 | grep rtt | cut -d'/' -f4 | awk '{ print $3 }')
+  local output4=$(ping -w 2 $1 | grep rtt | cut -d'/' -f4 | awk '{ print $3 }')
   local output4="$output4 ms"
   local output6=$(ping6 -w 2 $1 | grep rtt | cut -d'/' -f4 | awk '{ print $3 }')
   local output6="$output6 ms"

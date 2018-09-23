@@ -29,11 +29,11 @@ next() {
 }
 
 speed_test() {
-    local output4=$(LANG=C wget -4O /dev/null -T300 $1 2>&1)
+    local output4=$(LANG=C wget -4O /dev/null -T30 $1 2>&1)
     local speedtest4=$(printf '%s' "$output4" | awk '/\/dev\/null/ {speed=$3 $4} END {gsub(/\(|\)/,"",speed); print speed}')
     local nodeName=$2
     if [[ "$ipv6" != "" ]]; then
-      local output6=$(LANG=C wget -6O /dev/null -T300 $1 2>&1)
+      local output6=$(LANG=C wget -6O /dev/null -T30 $1 2>&1)
       local speedtest6=$(printf '%s' "$output6" | awk '/\/dev\/null/ {speed=$3 $4} END {gsub(/\(|\)/,"",speed); print speed}')
       printf "${YELLOW}%-32s${GREEN}%-24s${RED}%-14s${PLAIN}\n" "${nodeName}" "${speedtest4}" "${speedtest6}"
     else

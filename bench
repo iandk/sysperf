@@ -48,6 +48,7 @@ speed_result() {
     speed_test 'http://speedtest.london.linode.com/100MB-london.bin' 'Linode, London'
     speed_test 'http://speedtest-lon1.digitalocean.com/100mb.test' 'Digitalocean, London'
     speed_test 'http://speedtest-ams2.digitalocean.com/100mb.test' 'Digitalocean, Amsterdam'
+    speed_test 'https://par-fr-ping.vultr.com/vultr.com.100MB.bin' 'Vultr, Paris'
 }
 
 ping_test() {

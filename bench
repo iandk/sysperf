@@ -66,6 +66,7 @@ ping_test() {
 ping_result() {
   ping_test 'speedtest.frankfurt.linode.com' 'Frankfurt'
   ping_test 'speedtest.newark.linode.com' 'New York'
+  ping_test 'speedtest.fremont.linode.com' 'San Francisco'
   ping_test 'speedtest.singapore.linode.com' 'Singapore'
 
 }

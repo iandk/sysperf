@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# perf.pw
+# sysperf.co
 # A simple benchmark script to test your Disk, Network and CPU performance
 #
 # Based on Bench.sh

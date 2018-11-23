@@ -1,4 +1,4 @@
-## Perf.pw
+## sysperf.co
 A simple benchmark script to test your Disk, Network and CPU performance.     
 Currently only supports Debian/ Ubuntu based systems.
 &nbsp;

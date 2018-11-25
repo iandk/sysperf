@@ -116,7 +116,7 @@ disk_used_size=$( calc_disk "${disk_size2[@]}" )
 
 clear
 next
-echo -e "${RED}perf.pw${PLAIN} -- ${YELLOW}https://github.com/iandk/perf${PLAIN}"
+echo -e "${RED}sysperf.co${PLAIN} -- ${YELLOW}https://github.com/iandk/perf${PLAIN}"
 next
 
 echo -e "CPU model            : ${BLUE}$cname${PLAIN}"

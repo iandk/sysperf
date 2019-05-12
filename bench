@@ -42,12 +42,17 @@ speed_test() {
 }
 
 speed_result() {
-    speed_test 'http://speedtest.frankfurt.linode.com/100MB-frankfurt.bin' 'Linode, Frankfurt'
-    speed_test 'http://speedtest-fra1.digitalocean.com/100mb.test' 'Digitalocean, Frankfurt'
-    speed_test 'http://speedtest.meerfarbig.net/testfiles/100M' 'Meerfarbig, Frankfurt'
-    speed_test 'http://speedtest.london.linode.com/100MB-london.bin' 'Linode, London'
-    speed_test 'http://speedtest-lon1.digitalocean.com/100mb.test' 'Digitalocean, London'
-    speed_test 'http://speedtest-ams2.digitalocean.com/100mb.test' 'Digitalocean, Amsterdam'
+    speed_test 'http://speedtest.frankfurt.linode.com/100MB-frankfurt.bin' 'Frankfurt, Linode'
+    speed_test 'http://speedtest-fra1.digitalocean.com/100mb.test' 'Frankfurt, Digitalocean'
+    speed_test 'http://speedtest.meerfarbig.net/testfiles/100M' 'Frankfurt, Meerfarbig'
+    speed_test 'http://speedtest-ams2.digitalocean.com/100mb.test' 'Amsterdam, Digitalocean'
+    speed_test 'http://speedtest.london.linode.com/100MB-london.bin' 'London, Linode'
+    speed_test 'http://speedtest.newark.linode.com/100MB-newark.bin' 'Newark, Linode'
+    speed_test 'http://speedtest-nyc1.digitalocean.com/100mb.test' 'New York, Digitalocean'
+    speed_test 'http://speedtest.fremont.linode.com/100MB-fremont.bin' 'Fremont, Linode'
+    speed_test 'http://speedtest-sfo1.digitalocean.com/100mb.test' 'San Francisco, Digitalocean'
+    speed_test 'http://speedtest.singapore.linode.com/100MB-singapore.bin' 'Singapore, Linode'
+    speed_test 'http://speedtest.tokyo2.linode.com/100MB-tokyo2.bin' 'Tokyo, Linode'
 }
 
 ping_test() {

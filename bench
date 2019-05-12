@@ -52,7 +52,6 @@ speed_result() {
     speed_test 'http://speedtest.fremont.linode.com/100MB-fremont.bin' 'Fremont, Linode'
     speed_test 'http://speedtest-sfo1.digitalocean.com/100mb.test' 'San Francisco, Digitalocean'
     speed_test 'http://speedtest.singapore.linode.com/100MB-singapore.bin' 'Singapore, Linode'
-    speed_test 'http://speedtest.tokyo2.linode.com/100MB-tokyo2.bin' 'Tokyo, Linode'
 }
 
 ping_test() {

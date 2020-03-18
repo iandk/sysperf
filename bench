@@ -45,6 +45,7 @@ speed_result() {
     speed_test 'http://speedtest.frankfurt.linode.com/100MB-frankfurt.bin' 'Frankfurt, Linode'
     speed_test 'http://speedtest-fra1.digitalocean.com/100mb.test' 'Frankfurt, Digitalocean'
     speed_test 'http://speedtest.meerfarbig.net/testfiles/100M' 'Frankfurt, Meerfarbig'
+    speed_test 'http://lg.lumaserv.com/100MB.test' 'Frankfurt, LUMASERV'
     speed_test 'http://speedtest-ams2.digitalocean.com/100mb.test' 'Amsterdam, Digitalocean'
     speed_test 'http://speedtest.london.linode.com/100MB-london.bin' 'London, Linode'
     speed_test 'http://speedtest-lon1.digitalocean.com/100mb.test' 'London, Digitalocean'

@@ -1,4 +1,4 @@
-## sysperf.co
+## getsysperf.com
 A simple benchmark script to test your Disk, Network and CPU performance.     
 Currently only supports Debian/ Ubuntu based systems.
 &nbsp;

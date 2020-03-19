@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# sysperf.co
+# getsysperf.com
 # A simple benchmark script to test your Disk, Network and CPU performance
 #
 # Based on Bench.sh
@@ -10,6 +10,8 @@ if  [ ! -e '/usr/bin/wget' ]; then
     echo "Error: wget command not found. You must be install wget command at first."
     exit 1
 fi
+ipv6=$( wget -qO- -t1 -T2 ipv6.icanhazip.com )
+
 
 # Colors
 RED='\033[0;31m'
@@ -43,12 +45,13 @@ speed_test() {
 
 speed_result() {
     speed_test 'http://speedtest.frankfurt.linode.com/100MB-frankfurt.bin' 'Frankfurt, Linode'
-    speed_test 'http://speedtest-fra1.digitalocean.com/100mb.test' 'Frankfurt, Digitalocean'
-    speed_test 'http://speedtest.meerfarbig.net/testfiles/100M' 'Frankfurt, Meerfarbig'
     speed_test 'http://lg.lumaserv.com/100MB.test' 'Frankfurt, LUMASERV'
     speed_test 'http://speedtest-ams2.digitalocean.com/100mb.test' 'Amsterdam, Digitalocean'
     speed_test 'http://speedtest.london.linode.com/100MB-london.bin' 'London, Linode'
-    speed_test 'http://speedtest-lon1.digitalocean.com/100mb.test' 'London, Digitalocean'
+    speed_test 'http://speedtest.newark.linode.com/100MB-newark.bin' 'Newark, Linode'
+    speed_test 'http://speedtest.fremont.linode.com/100MB-newark.bin' 'Fremont, Linode'
+    speed_test 'http://speedtest.singapore.linode.com/100MB-singapore.bin' 'Singapore, Linode'
+
 }
 
 ping_test() {
@@ -70,7 +73,6 @@ ping_result() {
   ping_test 'speedtest.fremont.linode.com' 'San Francisco'
   ping_test 'speedtest.singapore.linode.com' 'Singapore'
   ping_test 'speedtest.tokyo2.linode.com' 'Tokyo'
-
 }
 
 io_test() {
@@ -79,7 +81,7 @@ io_test() {
 
 cpu_bench() {
     apt update > /dev/null 2>&1 && apt install -qqy sysbench > /dev/null 2>&1
-    cpu_time=$(sysbench --test=cpu --num-threads=$(grep -c '^processor' /proc/cpuinfo) --cpu-max-prime=9000 run | grep "total time:" | sed 's/ //g' | sed "s/totaltime://g")
+    cpu_time=$(sysbench cpu --num-threads=$(grep -c '^processor' /proc/cpuinfo) --cpu-max-prime=9000 run | grep "total time:" | sed 's/ //g' | sed "s/totaltime://g")
 }
 
 calc_disk() {
@@ -110,7 +112,6 @@ opsy=$( get_opsy )
 arch=$( uname -m )
 lbit=$( getconf LONG_BIT )
 kern=$( uname -r )
-ipv6=$( wget -qO- -t1 -T2 ipv6.icanhazip.com )
 disk_size1=($( LANG=C df -hPl | grep -wvE '\-|none|tmpfs|devtmpfs|by-uuid|chroot|Filesystem|udev|docker' | awk '{print $2}' ))
 disk_size2=($( LANG=C df -hPl | grep -wvE '\-|none|tmpfs|devtmpfs|by-uuid|chroot|Filesystem|udev|docker' | awk '{print $3}' ))
 disk_total_size=$( calc_disk "${disk_size1[@]}" )
@@ -118,7 +119,7 @@ disk_used_size=$( calc_disk "${disk_size2[@]}" )
 
 clear
 next
-echo -e "${RED}sysperf.co${PLAIN} -- ${YELLOW}https://github.com/iandk/perf${PLAIN}"
+echo -e "${RED}getsysperf.com${PLAIN} -- ${YELLOW}https://github.com/iandk/sysperf${PLAIN}"
 next
 
 echo -e "CPU model            : ${BLUE}$cname${PLAIN}"
@@ -164,4 +165,4 @@ fi
     
 speed_result && next
 cpu_bench
-echo -e "Total CPU bench time : ${BLUE}$cpu_time${PLAIN}"&& next
+echo -e "CPU bench time : ${BLUE}$cpu_time${PLAIN}"&& next

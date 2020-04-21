@@ -3,11 +3,15 @@
 # getsysperf.com
 # A simple benchmark script to test your Disk, Network and CPU performance
 #
-# Based on Bench.sh
-#
+
+
 
 if  [ ! -e '/usr/bin/wget' ]; then
-    echo "Error: wget command not found. You must be install wget command at first."
+    echo "Error: wget command not found. You must install wget command at first."
+    exit 1
+fi
+if  [ ! -e '/usr/bin/fio' ]; then
+    echo "Error: fio command not found. You must install fio command at first."
     exit 1
 fi
 ipv6=$( wget -qO- -t1 -T2 ipv6.icanhazip.com )
@@ -27,7 +31,7 @@ get_opsy() {
 }
 
 next() {
-    printf "%-70s\n" "-" | sed 's/\s/-/g'
+    printf "%-5s\n" "-" | sed 's/\s/-/g'
 }
 
 speed_test() {
@@ -45,13 +49,12 @@ speed_test() {
 
 speed_result() {
     speed_test 'http://speedtest.frankfurt.linode.com/100MB-frankfurt.bin' 'Frankfurt, Linode'
-    speed_test 'http://lg.lumaserv.com/100MB.test' 'Frankfurt, LUMASERV'
+    speed_test 'http://fra36-speedtest-1.tele2.net//100MB.zip' 'Frankfurt, TELE2'
     speed_test 'http://speedtest-ams2.digitalocean.com/100mb.test' 'Amsterdam, Digitalocean'
     speed_test 'http://speedtest.london.linode.com/100MB-london.bin' 'London, Linode'
     speed_test 'http://speedtest.newark.linode.com/100MB-newark.bin' 'Newark, Linode'
     speed_test 'http://speedtest.fremont.linode.com/100MB-newark.bin' 'Fremont, Linode'
     speed_test 'http://speedtest.singapore.linode.com/100MB-singapore.bin' 'Singapore, Linode'
-
 }
 
 ping_test() {
@@ -76,12 +79,30 @@ ping_result() {
 }
 
 io_test() {
-    (LANG=C dd if=/dev/zero of=test_$$ bs=64k count=16k conv=fdatasync && rm -f test_$$ ) 2>&1 | awk -F, '{io=$NF} END { print io}' | sed 's/^[ \t]*//;s/[ \t]*$//'
+   # run rand read/write mixed 512kb fio test
+   fio --name=rand_rw_512k --ioengine=libaio --rw=randrw --rwmixread=50 --bs=512k --iodepth=64 --numjobs=2 --size=2G --runtime=30 --gtod_reduce=1 --direct=1 --filename=$$_IOTEST | grep "WRITE:" | awk '{print $3}' | sed 's/,//g' | sed 's/(//g' | sed 's/)//g'
+   rm *_IOTEST
 }
 
-cpu_bench() {
-    apt update > /dev/null 2>&1 && apt install -qqy sysbench > /dev/null 2>&1
-    cpu_time=$(sysbench cpu --num-threads=$(grep -c '^processor' /proc/cpuinfo) --cpu-max-prime=9000 run | grep "total time:" | sed 's/ //g' | sed "s/totaltime://g")
+
+geekbench5() {
+	echo -e "Running Geekbench5 CPU Benchmark. This will take a few minutes..."
+	GEEKBENCH_PATH=$HOME/geekbench
+	mkdir -p $GEEKBENCH_PATH
+	curl -s http://cdn.geekbench.com/Geekbench-5.1.0-Linux.tar.gz  | tar xz --strip-components=1 -C $GEEKBENCH_PATH
+	GEEKBENCH_TEST=$($GEEKBENCH_PATH/geekbench5 | grep "https://browser")
+	GEEKBENCH_URL=$(echo -e $GEEKBENCH_TEST | head -1)
+	GEEKBENCH_URL_CLAIM=$(echo $GEEKBENCH_URL | awk '{ print $2 }')
+	GEEKBENCH_URL=$(echo $GEEKBENCH_URL | awk '{ print $1 }')
+	sleep 10
+	GEEKBENCH_SCORES_SINGLE=$(curl -s $GEEKBENCH_URL | grep "class='score'" | head -2 | tr -d \'\" | sed 's/class=score//g' | sed "s/ //g" | sed -n 's:.*<div>\(.*\)</div>.*:\1:p' | head -n 1)
+	GEEKBENCH_SCORES_MULTI=$(curl -s $GEEKBENCH_URL | grep "class='score'" | head -2 | tr -d \'\" | sed 's/class=score//g' | sed "s/ //g" | sed -n 's:.*<div>\(.*\)</div>.*:\1:p' | sed -n 2p)
+	
+	echo -ne "\e[1A"; echo -ne "\033[0K\r"
+	echo -e "Geekbench v5"
+	echo -e "Single Core          :" ${BLUE} $GEEKBENCH_SCORES_SINGLE ${PLAIN}
+	echo -e "Multi Core           :" ${YELLOW} $GEEKBENCH_SCORES_MULTI ${PLAIN}
+
 }
 
 calc_disk() {
@@ -118,7 +139,6 @@ disk_total_size=$( calc_disk "${disk_size1[@]}" )
 disk_used_size=$( calc_disk "${disk_size2[@]}" )
 
 clear
-next
 echo -e "${RED}getsysperf.com${PLAIN} -- ${YELLOW}https://github.com/iandk/sysperf${PLAIN}"
 next
 
@@ -140,13 +160,10 @@ io2=$( io_test )
 echo -e "I/O speed(2nd run)   : ${YELLOW}$io2${PLAIN}"
 io3=$( io_test )
 echo -e "I/O speed(3rd run)   : ${YELLOW}$io3${PLAIN}"
-ioraw1=$( echo $io1 | awk 'NR==1 {print $1}' )
-[ "`echo $io1 | awk 'NR==1 {print $2}'`" == "GB/s" ] && ioraw1=$( awk 'BEGIN{print '$ioraw1' * 1024}' )
-ioraw2=$( echo $io2 | awk 'NR==1 {print $1}' )
-[ "`echo $io2 | awk 'NR==1 {print $2}'`" == "GB/s" ] && ioraw2=$( awk 'BEGIN{print '$ioraw2' * 1024}' )
-ioraw3=$( echo $io3 | awk 'NR==1 {print $1}' )
-[ "`echo $io3 | awk 'NR==1 {print $2}'`" == "GB/s" ] && ioraw3=$( awk 'BEGIN{print '$ioraw3' * 1024}' )
-ioall=$( awk 'BEGIN{print '$ioraw1' + '$ioraw2' + '$ioraw3'}' )
+rawio1=$( echo $io1 | sed 's/MB//g' | sed 's/s//g' | sed 's/.$//')
+rawio2=$( echo $io2 | sed 's/MB//g' | sed 's/s//g' | sed 's/.$//')
+rawio3=$( echo $io3 | sed 's/MB//g' | sed 's/s//g' | sed 's/.$//')
+ioall=$( awk 'BEGIN{print '$rawio1' + '$rawio2' + '$rawio3'}' )
 ioavg=$( awk 'BEGIN{printf "%.1f", '$ioall' / 3}' )
 echo -e "Average I/O speed    : ${YELLOW}$ioavg MB/s${PLAIN}"
 next
@@ -164,5 +181,4 @@ else
 fi
     
 speed_result && next
-cpu_bench
-echo -e "CPU bench time : ${BLUE}$cpu_time${PLAIN}"&& next
+geekbench5 && next

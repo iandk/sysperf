@@ -1,4 +1,5 @@
 ## getsysperf.com
+### There seem to be some issues with the Geekbench5 implementation, depending on the OS
 A simple benchmark script to test your Disk, Network and CPU performance.     
 Currently only supports Debian/ Ubuntu based systems.
 &nbsp;

@@ -10,6 +10,10 @@ if  [ ! -e '/usr/bin/wget' ]; then
     echo "Error: wget command not found. You must install wget command at first."
     exit 1
 fi
+if  [ ! -e '/usr/bin/curl' ]; then
+    echo "Error: curl command not found. You must install curl command at first."
+    exit 1
+fi
 if  [ ! -e '/usr/bin/fio' ]; then
     echo "Error: fio command not found. You must install fio command at first."
     exit 1

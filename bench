@@ -10,12 +10,12 @@ if  [ ! -e '/usr/bin/wget' ]; then
     echo "Error: wget command not found. You must install wget command at first."
     exit 1
 fi
-if  [ ! -e '/usr/bin/curl' ]; then
-    echo "Error: curl command not found. You must install curl command at first."
-    exit 1
-fi
 if  [ ! -e '/usr/bin/fio' ]; then
     echo "Error: fio command not found. You must install fio command at first."
+    exit 1
+fi
+if  [ ! -e '/usr/bin/curl' ]; then
+    echo "Error: curl command not found. You must install curl command at first."
     exit 1
 fi
 ipv6=$( wget -qO- -t1 -T2 ipv6.icanhazip.com )
@@ -90,6 +90,13 @@ io_test() {
 
 
 geekbench5() {
+  ram=$(free -m | awk '/Mem/ {print $2}')
+  if [ $ram -lt 2048 ]
+  then
+      echo "RAM:" $ram"MB"
+      echo "You don't have enough RAM to run Geekbench"
+      exit 1
+  fi
 	echo -e "Running Geekbench5 CPU Benchmark. This will take a few minutes..."
 	GEEKBENCH_PATH=$HOME/geekbench
 	mkdir -p $GEEKBENCH_PATH
@@ -143,6 +150,7 @@ disk_total_size=$( calc_disk "${disk_size1[@]}" )
 disk_used_size=$( calc_disk "${disk_size2[@]}" )
 
 clear
+next
 echo -e "${RED}getsysperf.com${PLAIN} -- ${YELLOW}https://github.com/iandk/sysperf${PLAIN}"
 next
 

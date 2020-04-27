@@ -84,7 +84,7 @@ ping_result() {
 
 io_test() {
    # run rand read/write mixed 512kb fio test
-   fio --name=rand_rw_512k --ioengine=libaio --rw=randrw --rwmixread=50 --bs=512k --iodepth=64 --numjobs=2 --size=2G --runtime=30 --gtod_reduce=1 --direct=1 --filename=$$_IOTEST | grep "WRITE:" | awk '{print $3}' | sed 's/,//g' | sed 's/(//g' | sed 's/)//g'
+   fio --name=rand_rw_512k --ioengine=libaio --rw=randrw --rwmixread=50 --bs=512k --iodepth=64 --numjobs=2 --size=2G --runtime=30 --gtod_reduce=1 --direct=1 --filename=$RANDOM"_IOTEST" | grep "WRITE:" | awk '{print $3}' | sed 's/,//g' | sed 's/(//g' | sed 's/)//g'
    rm *_IOTEST
 }
 

@@ -15,3 +15,8 @@ apt install dialog ca-certificates
 &nbsp;
 ### Sample Output
 ![Sample Output](sample_output.png)
+
+
+### Donation
+
+[Help me to keep the project alive](http://paypal.me/ianklemm)

@@ -86,6 +86,17 @@ get_opsy() {
     [ -f /etc/os-release ] && awk -F'[= "]' '/PRETTY_NAME/{print $3,$4,$5}' /etc/os-release && return
     [ -f /etc/lsb-release ] && awk -F'[="]+' '/DESCRIPTION/{print $2}' /etc/lsb-release && return
 }
+get_sys_type() {
+    if [ $(systemd-detect-virt) == none ]; then 
+            sys_type="Baremetal"
+        elif [ $(systemd-detect-virt) == kvm ]; then
+            sys_type="KVM"
+        elif [ $(systemd-detect-virt) == lxc ]; then
+            sys_type="LXC"
+        elif [ $(systemd-detect-virt) == openvz ]; then
+            sys_type="OpenVZ"
+    fi
+}
 
 next() {
     printf "%-5s\n" "-" | sed 's/\s/-/g'
@@ -196,7 +207,8 @@ next
 echo -e "${RED}getsysperf.com${PLAIN} -- ${YELLOW}https://github.com/iandk/sysperf${PLAIN}"
 next
 get_netinfo
-
+get_sys_type
+echo -e "System type          : ${BLUE}$sys_type${PLAIN}"
 echo -e "CPU model            : ${BLUE}$cname${PLAIN}"
 echo -e "Number of cores      : ${BLUE}$cores${PLAIN}"
 echo -e "CPU frequency        : ${BLUE}$freq MHz${PLAIN}"
@@ -211,9 +223,9 @@ echo -e "Kernel               : ${BLUE}$kern${PLAIN}"
 echo -e "ISP                  : ${BLUE}$isp${PLAIN}"
 echo -e "ASN                  : ${BLUE}$as${PLAIN}"
 if [[ "$ipv6" != "" ]]; then
-echo -e "IPv6                 : ${BLUE}Yes${PLAIN}"
+echo -e "IPv6 Support         : ${BLUE}Yes${PLAIN}"
 else
-echo -e "IPv6                 : ${BLUE}No${PLAIN}"
+echo -e "IPv6 Support         : ${BLUE}No${PLAIN}"
 fi
 next
 io1=$( io_test )

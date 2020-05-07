@@ -13,10 +13,11 @@ You don't get an output after running the script? Make sure the following packag
 apt install dialog ca-certificates
 ```
 &nbsp;
+### Donation
+
+[Help me to keep the project alive](http://paypal.me/ianklemm)
+
 ### Sample Output
 ![Sample Output](sample_output.png)
 
 
-### Donation
-
-[Help me to keep the project alive](http://paypal.me/ianklemm)

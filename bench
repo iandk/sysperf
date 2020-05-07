@@ -55,7 +55,7 @@ if  [ ! -e '/usr/bin/curl' ]; then
     echo "Error: curl command not found. You must install curl command at first."
     exit 1
 fi
-if  [ ! -e '/usr/bin/jg' ]; then
+if  [ ! -e '/usr/bin/jq' ]; then
     echo "Error: jq command not found. You must install jq command at first."
     exit 1
 fi

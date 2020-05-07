@@ -5,7 +5,44 @@
 #
 
 
+#
+#
+# VALIDATION
+#
+#
 
+# Check if at least Debian 10 or Ubuntu 1904 is used
+if grep -qs "ubuntu" /etc/os-release; then
+	os="ubuntu"
+	os_version=$(grep 'VERSION_ID' /etc/os-release | cut -d '"' -f 2 | tr -d '.')
+	group_name="nogroup"
+elif [[ -e /etc/debian_version ]]; then
+	os="debian"
+	os_version=$(grep -oE '[0-9]+' /etc/debian_version | head -1)
+	group_name="nogroup"
+else
+	echo "Looks like you aren't running this installer on Debian or Ubuntu"
+	exit
+fi
+if [[ "$os" == "ubuntu" && "$os_version" -lt 1904 ]]; then
+	echo "Ubuntu 18.04 or higher is required to use this installer
+This version of Ubuntu is too old and unsupported"
+	exit
+fi
+
+if [[ "$os" == "debian" && "$os_version" -lt 10 ]]; then
+	echo "Debian 10 or higher is required to use this installer
+This version of Debian is too old and unsupported"
+	exit
+fi
+
+# Check if user is root
+if [[ "$EUID" -ne 0 ]]; then
+	echo "Sorry, you need to run this as root"
+	exit
+fi
+
+# Check if the required packages are installed
 if  [ ! -e '/usr/bin/wget' ]; then
     echo "Error: wget command not found. You must install wget command at first."
     exit 1
@@ -18,7 +55,11 @@ if  [ ! -e '/usr/bin/curl' ]; then
     echo "Error: curl command not found. You must install curl command at first."
     exit 1
 fi
+
+# Test IPv6 connectivity
 ipv6=$( wget -qO- -t1 -T2 ipv6.icanhazip.com )
+# Get public IP for ASN/ ISP check
+as_check=$( wget -qO- -t1 -T2 icanhazip.com )
 
 
 # Colors
@@ -27,6 +68,18 @@ GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
 BLUE='\033[0;36m'
 PLAIN='\033[0m'
+
+
+#
+#
+# FUNCTIONS
+#
+#
+
+get_netinfo() {
+    isp=$(curl -s http://ip-api.com/json/$as_check | jq '.isp' | sed 's/"//g')
+    as=$(curl -s http://ip-api.com/json/$as_check | jq '.as' | sed 's/"//g')
+}
 
 get_opsy() {
     [ -f /etc/redhat-release ] && awk '{print ($1,$3~/^[0-9]/?$3:$4)}' /etc/redhat-release && return
@@ -39,16 +92,10 @@ next() {
 }
 
 speed_test() {
-    local output4=$(LANG=C wget -4O /dev/null -T30 $1 2>&1)
-    local speedtest4=$(printf '%s' "$output4" | awk '/\/dev\/null/ {speed=$3 $4} END {gsub(/\(|\)/,"",speed); print speed}')
+    local output=$(LANG=C wget -O /dev/null -T30 $1 2>&1)
+    local speedtest=$(printf '%s' "$output" | awk '/\/dev\/null/ {speed=$3 $4} END {gsub(/\(|\)/,"",speed); print speed}')
     local nodeName=$2
-    if [[ "$ipv6" != "" ]]; then
-      local output6=$(LANG=C wget -6O /dev/null -T30 $1 2>&1)
-      local speedtest6=$(printf '%s' "$output6" | awk '/\/dev\/null/ {speed=$3 $4} END {gsub(/\(|\)/,"",speed); print speed}')
-      printf "${YELLOW}%-32s${GREEN}%-24s${RED}%-14s${PLAIN}\n" "${nodeName}" "${speedtest4}" "${speedtest6}"
-    else
-      printf "${YELLOW}%-32s${GREEN}%-24s${RED}%-14s${PLAIN}\n" "${nodeName}" "${speedtest4}"
-    fi
+    printf "${YELLOW}%-32s${GREEN}%-24s${RED}%-14s${PLAIN}\n" "${nodeName}" "${speedtest}"
 }
 
 speed_result() {
@@ -63,16 +110,10 @@ speed_result() {
 }
 
 ping_test() {
-  local nodename=$2
-  local output4=$(ping -w 2 $1 | grep rtt | cut -d'/' -f4 | awk '{ print $3 }')
-  local output4="$output4 ms"
-  if [[ "$ipv6" != "" ]]; then
-    local output6=$(ping6 -w 2 $1 | grep rtt | cut -d'/' -f4 | awk '{ print $3 }')
-    local output6="$output6 ms"
-    printf "${YELLOW}%-32s${GREEN}%-24s${RED}%-14s${PLAIN}\n" "${nodename}" "${output4}" "${output6}"
-  else
-    printf "${YELLOW}%-32s${GREEN}%-24s${RED}%-14s${PLAIN}\n" "${nodename}" "${output4}"
-  fi
+    local nodename=$2
+    local output=$(ping -w 2 $1 | grep rtt | cut -d'/' -f4 | awk '{ print $3 }')
+    local output="$output ms"
+    printf "${YELLOW}%-32s${GREEN}%-24s${RED}%-14s${PLAIN}\n" "${nodename}" "${output}"
 }
 
 ping_result() {
@@ -84,13 +125,15 @@ ping_result() {
 }
 
 io_test() {
-   # run rand read/write mixed 512kb fio test
+   # Run rand read/write mixed 512kb fio test
    fio --name=rand_rw_512k --ioengine=libaio --rw=randrw --rwmixread=50 --bs=512k --iodepth=64 --numjobs=2 --size=2G --runtime=30 --gtod_reduce=1 --direct=1 --filename=$RANDOM"_IOTEST" | grep "WRITE:" | awk '{print $3}' | sed 's/,//g' | sed 's/(//g' | sed 's/)//g'
    rm *_IOTEST
+   sleep 10
 }
 
 
 geekbench5() {
+  # Check if system has at least 2GB RAM in order to run Geekbench 5
   ram=$(free -m | awk '/Mem/ {print $2}')
   if [ $ram -lt 2048 ]
   then
@@ -109,12 +152,10 @@ geekbench5() {
 	sleep 10
 	GEEKBENCH_SCORES_SINGLE=$(curl -s $GEEKBENCH_URL | grep "class='score'" | head -2 | tr -d \'\" | sed 's/class=score//g' | sed "s/ //g" | sed -n 's:.*<div>\(.*\)</div>.*:\1:p' | head -n 1)
 	GEEKBENCH_SCORES_MULTI=$(curl -s $GEEKBENCH_URL | grep "class='score'" | head -2 | tr -d \'\" | sed 's/class=score//g' | sed "s/ //g" | sed -n 's:.*<div>\(.*\)</div>.*:\1:p' | sed -n 2p)
-	
 	echo -ne "\e[1A"; echo -ne "\033[0K\r"
 	echo -e "Geekbench v5"
 	echo -e "Single Core          :" ${BLUE} $GEEKBENCH_SCORES_SINGLE ${PLAIN}
 	echo -e "Multi Core           :" ${YELLOW} $GEEKBENCH_SCORES_MULTI ${PLAIN}
-
 }
 
 calc_disk() {
@@ -154,6 +195,7 @@ clear
 next
 echo -e "${RED}getsysperf.com${PLAIN} -- ${YELLOW}https://github.com/iandk/sysperf${PLAIN}"
 next
+get_netinfo
 
 echo -e "CPU model            : ${BLUE}$cname${PLAIN}"
 echo -e "Number of cores      : ${BLUE}$cores${PLAIN}"
@@ -166,6 +208,13 @@ echo -e "Load average         : ${BLUE}$load${PLAIN}"
 echo -e "OS                   : ${BLUE}$opsy${PLAIN}"
 echo -e "Arch                 : ${BLUE}$arch ($lbit Bit)${PLAIN}"
 echo -e "Kernel               : ${BLUE}$kern${PLAIN}"
+echo -e "ISP                  : ${BLUE}$isp${PLAIN}"
+echo -e "ASN                  : ${BLUE}$as${PLAIN}"
+if [[ "$ipv6" != "" ]]; then
+echo -e "IPv6                 : ${BLUE}Yes${PLAIN}"
+else
+echo -e "IPv6                 : ${BLUE}No${PLAIN}"
+fi
 next
 io1=$( io_test )
 echo -e "I/O speed(1st run)   : ${YELLOW}$io1${PLAIN}"
@@ -180,18 +229,10 @@ ioall=$( awk 'BEGIN{print '$rawio1' + '$rawio2' + '$rawio3'}' )
 ioavg=$( awk 'BEGIN{printf "%.1f", '$ioall' / 3}' )
 echo -e "Average I/O speed    : ${YELLOW}$ioavg MB/s${PLAIN}"
 next
-if [[ "$ipv6" != "" ]]; then
-  printf "%-32s%-24s%-14s\n" "Location" "IPv4 Latency" "IPv6 Latency"
-else
-  printf "%-32s%-24s%-14s\n" "Location" "IPv4 Latency"
-fi
+printf "%-32s%-24s%-14s\n" "Location" "Latency"
 ping_result
 next
-if [[ "$ipv6" != "" ]]; then
-    printf "%-32s%-24s%-14s\n" "Location" "IPv4 Speed" "IPv6 Speed"
-else
-  printf "%-32s%-24s%-14s\n" "Location" "IPv4 Speed"
-fi
+printf "%-32s%-24s%-14s\n" "Location" "Speed"
     
 speed_result && next
 geekbench5 && next

@@ -10,7 +10,7 @@ wget -qO- https://git.io/fABdu | bash
     
 You don't get an output after running the script? Make sure the following packages are installed.
 ```
-apt install dialog ca-certificates
+apt install dialog ca-certificates jq curl fio  wget
 ```
 &nbsp;
 ### Donation

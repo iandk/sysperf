@@ -25,7 +25,7 @@ else
 	exit
 fi
 if [[ "$os" == "ubuntu" && "$os_version" -lt 1904 ]]; then
-	echo "Ubuntu 18.04 or higher is required to use this installer
+	echo "Ubuntu 19.04 or higher is required to use this installer
 This version of Ubuntu is too old and unsupported"
 	exit
 fi

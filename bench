@@ -24,8 +24,8 @@ else
 	echo "Looks like you aren't running this installer on Debian or Ubuntu"
 	exit
 fi
-if [[ "$os" == "ubuntu" && "$os_version" -lt 1904 ]]; then
-	echo "Ubuntu 19.04 or higher is required to use this installer
+if [[ "$os" == "ubuntu" && "$os_version" -lt 1804 ]]; then
+	echo "Ubuntu 18.04 or higher is required to use this installer
 This version of Ubuntu is too old and unsupported"
 	exit
 fi
@@ -115,7 +115,6 @@ speed_test() {
 
 speed_result() {
     speed_test 'http://speedtest.frankfurt.linode.com/100MB-frankfurt.bin' 'Frankfurt, Linode'
-    speed_test 'http://lg.lumaserv.com/100MB.test' 'Frankfurt, LUMASERV'
     speed_test 'https://fra-de-ping.vultr.com/vultr.com.100MB.bin' 'Frankfurt, Vultr'
     speed_test 'http://fra36-speedtest-1.tele2.net//100MB.zip' 'Frankfurt, TELE2'
     speed_test 'http://speedtest-ams2.digitalocean.com/100mb.test' 'Amsterdam, Digitalocean'

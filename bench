@@ -117,6 +117,7 @@ speed_result() {
     speed_test 'http://speedtest.frankfurt.linode.com/100MB-frankfurt.bin' 'Frankfurt, Linode'
     speed_test 'https://fra-de-ping.vultr.com/vultr.com.100MB.bin' 'Frankfurt, Vultr'
     speed_test 'http://fra36-speedtest-1.tele2.net//100MB.zip' 'Frankfurt, TELE2'
+    speed_test 'https://speed.hetzner.de/100MB.bin' 'Nürnberg, Hetzner'
     speed_test 'http://speedtest-ams2.digitalocean.com/100mb.test' 'Amsterdam, Digitalocean'
     speed_test 'http://speedtest.london.linode.com/100MB-london.bin' 'London, Linode'
     speed_test 'https://par-fr-ping.vultr.com/vultr.com.100MB.bin' 'Paris, Vultr'

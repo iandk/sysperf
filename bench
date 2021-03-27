@@ -43,22 +43,15 @@ if [[ "$EUID" -ne 0 ]]; then
 fi
 
 # Check if the required packages are installed
-if  [ ! -e '/usr/bin/wget' ]; then
-    echo "Error: wget command not found. You must install wget command at first."
-    exit 1
+if  [ ! -e '/usr/bin/wget' ] || [ ! -e '/usr/bin/fio' ] || [ ! -e '/usr/bin/curl' ] || [ ! -e '/usr/bin/jq' ]; then
+    echo "Error: Couldn't find [wget, fio, curl, jq]"    	
+    read -p "Press enter to install the required packages " 
+   
+   apt update && apt install -y curl jq fio
 fi
-if  [ ! -e '/usr/bin/fio' ]; then
-    echo "Error: fio command not found. You must install fio command at first."
-    exit 1
-fi
-if  [ ! -e '/usr/bin/curl' ]; then
-    echo "Error: curl command not found. You must install curl command at first."
-    exit 1
-fi
-if  [ ! -e '/usr/bin/jq' ]; then
-    echo "Error: jq command not found. You must install jq command at first."
-    exit 1
-fi
+
+
+
 
 # Test IPv6 connectivity
 ipv6=$( wget -qO- -t1 -T2 ipv6.icanhazip.com )

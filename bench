@@ -44,10 +44,10 @@ fi
 
 # Check if the required packages are installed
 if  [ ! -e '/usr/bin/wget' ] || [ ! -e '/usr/bin/fio' ] || [ ! -e '/usr/bin/curl' ] || [ ! -e '/usr/bin/jq' ]; then
-    echo "Error: Couldn't find [wget, fio, curl, jq]"    	
-    read -p "Press enter to install the required packages " 
+    echo "Couldn't find [wget, fio, curl, jq]"    	
+    read -n 1 -r -s -p  "Please press enter to install the required packages automatically" 
    
-   apt update && apt install -y curl jq fio
+   apt update && apt install -y curl jq fio wget
 fi
 
 

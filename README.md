@@ -1,6 +1,5 @@
 ## getsysperf.com
-A simple benchmark script to test your Disk, Network and CPU performance.     
-Currently only supports Debian/ Ubuntu based systems.
+A simple benchmark script to test your Disk, Network and CPU performance on Debian/ Ubuntu based systems.     
 &nbsp;
 ### Usage
 You just have to run the command below.
@@ -8,7 +7,7 @@ You just have to run the command below.
 wget -qO- https://git.io/fABdu | bash
 ```
     
-You don't get an output after running the script? Make sure the following packages are installed.
+If you don't get an output when running the script, make sure the following packages are installed
 ```
 apt install dialog ca-certificates jq curl fio  wget
 ```

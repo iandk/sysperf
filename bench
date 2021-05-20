@@ -153,7 +153,7 @@ geekbench5() {
   if [ $ram -lt 2048 ]
   then
       echo "RAM:" $ram"MB"
-      echo "You don't have enough RAM to run Geekbench"
+      echo "Error: Not enough memory available. Geekbench 5 requires as least 2GB"
       exit 1
   fi
 	echo -e "Running Geekbench5 CPU Benchmark. This will take a few minutes..."

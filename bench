@@ -233,17 +233,17 @@ echo -e "IPv6 Support         : ${BLUE}No${PLAIN}"
 fi
 next
 io1=$( io_test )
-echo -e "I/O bandwith(1st run)   : ${YELLOW}$io1${PLAIN}"
+echo -e "I/O bandwidth (1st run)  : ${YELLOW}$io1${PLAIN}"
 io2=$( io_test )
-echo -e "I/O bandwith(2nd run)   : ${YELLOW}$io2${PLAIN}"
+echo -e "I/O bandwidth (2nd run)  : ${YELLOW}$io2${PLAIN}"
 io3=$( io_test )
-echo -e "I/O bandwith(3rd run)   : ${YELLOW}$io3${PLAIN}"
+echo -e "I/O bandwidth (3rd run)  : ${YELLOW}$io3${PLAIN}"
 rawio1=$( echo $io1 | sed 's/MB//g' | sed 's/s//g' | sed 's/.$//')
 rawio2=$( echo $io2 | sed 's/MB//g' | sed 's/s//g' | sed 's/.$//')
 rawio3=$( echo $io3 | sed 's/MB//g' | sed 's/s//g' | sed 's/.$//')
 ioall=$( awk 'BEGIN{print '$rawio1' + '$rawio2' + '$rawio3'}' )
 ioavg=$( awk 'BEGIN{printf "%.1f", '$ioall' / 3}' )
-echo -e "Average I/O bandwith    : ${YELLOW}$ioavg MB/s${PLAIN}"
+echo -e "Average I/O bandwidth    : ${YELLOW}$ioavg MB/s${PLAIN}"
 next
 printf "%-32s%-24s%-14s\n" "Location" "Latency"
 ping_result

@@ -171,6 +171,7 @@ geekbench5() {
 	echo -e "Geekbench v5"
 	echo -e "Single Core          :" ${BLUE} $GEEKBENCH_SCORES_SINGLE ${PLAIN}
 	echo -e "Multi Core           :" ${YELLOW} $GEEKBENCH_SCORES_MULTI ${PLAIN}
+	rm -rf geekbench/
 }
 
 calc_disk() {

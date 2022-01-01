@@ -114,6 +114,7 @@ speed_result() {
     speed_test 'http://fsn.icmp.hetzner.com/100MB.bin' 'Falkenstein, Hetzner'
     speed_test 'https://speed.hetzner.de/100MB.bin' 'Nuremberg, Hetzner'
     speed_test 'http://hel.icmp.hetzner.com/100MB.bin' 'Helsinki, Hetzner'
+    speed_test 'http://ash.icmp.hetzner.com/100MB.bin' 'Ashburn, Hetzner'
     speed_test 'http://speedtest-ams2.digitalocean.com/100mb.test' 'Amsterdam, Digitalocean'
     speed_test 'https://ams.lg.core-backbone.com/files/100MB.test' 'Amsterdam, Core-Backbone'
     speed_test 'http://speedtest.london.linode.com/100MB-london.bin' 'London, Linode'

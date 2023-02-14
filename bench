@@ -13,7 +13,7 @@
 
 # Check if at least Debian 10 or Ubuntu 1904 is used
 if grep -qs "ubuntu" /etc/os-release; then
-	os="ubuntu"
+	os="ubuntu"F
 	os_version=$(grep 'VERSION_ID' /etc/os-release | cut -d '"' -f 2 | tr -d '.')
 	group_name="nogroup"
 elif [[ -e /etc/debian_version ]]; then
@@ -109,7 +109,7 @@ speed_test() {
 speed_result() {
     speed_test 'http://speedtest.frankfurt.linode.com/100MB-frankfurt.bin' 'Frankfurt, Linode'
     speed_test 'https://fra-de-ping.vultr.com/vultr.com.100MB.bin' 'Frankfurt, Vultr'
-    speed_test 'http://fra36-speedtest-1.tele2.net/100MB.zip' 'Frankfurt, TELE2'
+    speed_test 'http://speedtest.tele2.net/100MB.zip' 'Frankfurt, TELE2'
     speed_test 'https://lg.combahton.net/100MB.test' 'Frankfurt, Combahton'
     speed_test 'http://fsn.icmp.hetzner.com/100MB.bin' 'Falkenstein, Hetzner'
     speed_test 'https://speed.hetzner.de/100MB.bin' 'Nuremberg, Hetzner'

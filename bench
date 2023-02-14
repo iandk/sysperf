@@ -13,7 +13,7 @@
 
 # Check if at least Debian 10 or Ubuntu 1904 is used
 if grep -qs "ubuntu" /etc/os-release; then
-	os="ubuntu"F
+	os="ubuntu"
 	os_version=$(grep 'VERSION_ID' /etc/os-release | cut -d '"' -f 2 | tr -d '.')
 	group_name="nogroup"
 elif [[ -e /etc/debian_version ]]; then

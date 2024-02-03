@@ -9,7 +9,7 @@ wget -qO- https://git.io/fABdu | bash
     
 If you don't get an output when running the script, make sure the following packages are installed
 ```
-apt install dialog ca-certificates jq curl fio  wget
+apt install dialog ca-certificates jq curl fio wget iputils-ping
 ```
 &nbsp;
 ### Donation
